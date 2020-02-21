@@ -11,6 +11,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+
+	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
 // SignatureData ...
@@ -35,14 +37,14 @@ func Signature(sig *SignatureData) (string, error) {
 	// hash算法
 	signAlgo := sig.SignAlgo
 	if signAlgo == "" {
-		signAlgo = HMACSHA256
+		signAlgo = structs.HMACSHA256
 	}
 
 	// 签名字符串
 	data := fmt.Sprintf("%s%s%s%d", sig.Message, sig.RequestPath, sig.RequestMethod, sig.Timestamp)
 
 	switch signAlgo {
-	case HMACSHA256:
+	case structs.HMACSHA256:
 		return getHmacSHA256Code(sig.Secret, data), nil
 	default:
 		return "", fmt.Errorf("%s", "Invalid sign algo")

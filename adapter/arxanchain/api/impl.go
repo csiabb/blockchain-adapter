@@ -49,9 +49,9 @@ func (c *ArxanchainClient) addSignatureHeader(header *http.Header, path, method 
 		return err
 	}
 
-	header.Add(SignatureTimestamp, fmt.Sprintf("%d", sigData.Timestamp))
-	header.Add(SignatureMethod, sigData.SignAlgo)
-	header.Add(SignatureInfo, signature)
+	header.Add(structs.SignatureTimestamp, fmt.Sprintf("%d", sigData.Timestamp))
+	header.Add(structs.SignatureMethod, sigData.SignAlgo)
+	header.Add(structs.SignatureInfo, signature)
 
 	return nil
 }

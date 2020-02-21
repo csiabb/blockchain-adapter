@@ -6,6 +6,16 @@ SPDX-License-Identifier: Apache-2.0
 
 package api
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"strings"
+)
+
 // Request is used to help build up a request
 type Request struct {
 	method string

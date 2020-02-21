@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -95,7 +94,7 @@ func (c *ArxanchainClient) DoRequest(r *Request) (time.Duration, *http.Response,
 	}
 	start := time.Now()
 
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	diff := time.Since(start)
 
 	// decrypt and verify resp.Body

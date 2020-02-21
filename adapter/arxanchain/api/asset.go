@@ -22,7 +22,7 @@ func (c *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (res
 	}
 
 	header := http.Header{}
-	err = cli.addSignatureHeader(&header, "", structs.PostMethod)
+	err = c.addSignatureHeader(&header, "", structs.PostMethod)
 	if nil != err {
 		return
 	}
@@ -67,13 +67,13 @@ func (c *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailReques
 	}
 
 	header := http.Header{}
-	err = c.addHeader(&header, "", structs.GetMethod)
+	err = c.addSignatureHeader(&header, "", structs.GetMethod)
 	if nil != err {
 		return
 	}
 
 	// Build http request
-	r := cli.c.NewRequest(structs.GetMethod, structs.QueryAssetDetailURL)
+	r := c.NewRequest(structs.GetMethod, structs.QueryAssetDetailURL)
 	r.SetHeaders(header)
 	r.SetParam("asset_did", body.AssetDID)
 
@@ -91,7 +91,7 @@ func (c *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailReques
 	}
 
 	if respBody.Code != structs.SuccCode {
-		err = fmt.Errorf()(respBody.Message)
+		err = fmt.Errorf(respBody.Message)
 		return
 	}
 

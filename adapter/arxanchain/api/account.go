@@ -22,7 +22,7 @@ func (c *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (re
 	}
 
 	header := http.Header{}
-	err = c.addHeader(&header, "", structs.PostMethod)
+	err = c.addSignatureHeader(&header, "", structs.PostMethod)
 	if nil != err {
 		return
 	}
@@ -33,7 +33,7 @@ func (c *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (re
 	r.SetBody(body)
 
 	// Do http request
-	_, resp, err := RequireOK(c.httpClient.DoRequest(r))
+	_, resp, err := RequireOK(c.DoRequest(r))
 	if err != nil {
 		return
 	}
