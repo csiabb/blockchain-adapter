@@ -6,11 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 package adapter
 
-import (
-	"blockchain-adapter/structs"
-)
-
 // BlockchainAdapter adapter of blockchain
 type BlockchainAdapter interface {
-	CommitTransaction(*structs.BCTransactionData) interface{}
+	CommitTransaction(interface{}) (interface{}, error)
+	QueryTransaction(interface{}) (interface{}, error)
 }
