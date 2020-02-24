@@ -23,7 +23,7 @@ jobs:
       run: |
         make mod
     - name: Check fmt
-      run: make default vet
+      run: make default fmt
             
     - name: Run Test
       run: make test

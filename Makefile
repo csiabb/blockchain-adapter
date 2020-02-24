@@ -21,6 +21,9 @@ VETPACKAGES=`go list ./...`
 GOFILES=`find . -name "*.go"`
 
 default:
+	@go vet $(VETPACKAGES)
+
+fmt-check:
 	@diff=$$(gofmt -s -d $(GOFILES)); \
 	if [ -n "$$diff" ]; then \
 		echo "Please run 'make fmt' and commit the result:"; \
@@ -42,7 +45,4 @@ mod:
 test:
 	@go test -cpu=1,2,4 -v -tags integration ./...
 
-vet:
-	@go vet $(VETPACKAGES)
-
-.PHONY: default fmt mod test vet
+.PHONY: default fmt-check fmt mod test
