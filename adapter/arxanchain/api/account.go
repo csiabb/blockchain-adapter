@@ -11,29 +11,31 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest"
+	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
 // CreateAccount ...
-func (c *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (result *structs.AccountResponse, err error) {
+func (ac *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (result *structs.AccountResponse, err error) {
 	if body == nil {
 		err = fmt.Errorf("request payload is null")
 		return
 	}
 
 	header := http.Header{}
-	err = c.addSignatureHeader(&header, "", structs.PostMethod)
+	err = ac.addSignatureHeader(&header, "", structs.PostMethod)
 	if nil != err {
 		return
 	}
 
 	// Build http request
-	r := c.NewRequest(structs.PostMethod, structs.CreateAccountURL)
+	r := ac.c.NewRequest(structs.PostMethod, structs.CreateAccountURL)
 	r.SetHeaders(header)
 	r.SetBody(body)
 
 	// Do http request
-	_, resp, err := RequireOK(c.DoRequest(r))
+	_, resp, err := rhttp.RequireOK(ac.c.DoRequest(r))
 	if err != nil {
 		return
 	}
@@ -41,12 +43,12 @@ func (c *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (re
 
 	// Parse http response
 	var respBody structs.CommonResponse
-	if err = DecodeBody(resp, &respBody); err != nil {
+	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
 		return
 	}
 
-	if respBody.Code != structs.SuccCode {
-		err = fmt.Errorf(respBody.Message)
+	if respBody.Code != rest.SuccCode {
+		err = fmt.Errorf("Code: %d, Message: %s", respBody.Code, respBody.Message)
 		return
 	}
 

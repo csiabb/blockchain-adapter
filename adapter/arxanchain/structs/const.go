@@ -22,7 +22,7 @@ const (
 	GetMethod  = "GET"
 )
 
-// api url
+// arxanchain api url
 const (
 	CreateAccountURL = "/api/v1/abox/account/create"
 
@@ -30,10 +30,10 @@ const (
 	QueryAssetDetailURL = "/api/v1/abox/asset/detail"
 )
 
-// aranchain blockchain transaction type
+// aranchain blockchain action type
 const (
 	CreateAccount = "create_acc"
-	UpdateAccount = "update_acc"
-	CreateAsset   = "create_asset"
-	UpdateAsset   = "update_asset"
+
+	CreateAsset = "create_asset"
+	QueryAsset  = "query_asset"
 )

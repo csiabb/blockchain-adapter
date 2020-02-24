@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 package structs
 
+// CommonRequest common rest request
+type CommonRequest struct {
+	Action  string
+	Request interface{}
+}
+
 // CommonResponse common rest response
 type CommonResponse struct {
 	Code    int         `json:"code"`
@@ -61,13 +67,13 @@ type QueryAssetDetailRequest struct {
 // QueryAssetDetailResponse ...
 type QueryAssetDetailResponse struct {
 	AssetDID   string   `json:"asset_did"`  // 数据资产DID
-	AssetName  string   `json:"asset_name"` // 数据资产标题
+	AssetName  string   `json:"asset_name"` // 数据资产名称
 	OwnerDID   string   `json:"owner_did"`  // 数据资产所属人
-	TxID       string   `json:"tx_id"`      // 数据资产上链交易ID
 	Intro      string   `json:"intro"`      // 资产简介
 	Category   string   `json:"category"`   // 资产类型
 	Visibility string   `json:"visibility"` // 可见性
-	Metadata   string   `json:"metadata"`   // 数据资产通用内容
 	Tags       []string `json:"tags"`       // 数据资产标签列表
+	Metadata   string   `json:"metadata"`   // 数据资产数据
+	TxID       string   `json:"tx_id"`      // 数据资产上链交易ID
 	CreatedAt  int64    `json:"created_at"` // 数据资产创建登记时间
 }

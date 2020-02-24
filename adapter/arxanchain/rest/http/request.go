@@ -4,10 +4,11 @@ Copyright ArxanChain Ltd. 2020 All Rights Reserved.
 SPDX-License-Identifier: Apache-2.0
 */
 
-package api
+package http
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -27,16 +28,6 @@ type Request struct {
 }
 
 // SetBody is used to set Request body.
-//
-// The input 'obj' arg can be '[]byte' type binary data,
-// also it can be structure object. When it is the structure
-// object, it will be converted to binary data as JSON using
-// json.Marshal.
-//
-// Once the crypto mode enabled, the binary data will
-// be signed and encrypted using crypto libary, then the
-// final result set to the request body.
-//
 func (r *Request) SetBody(obj interface{}) error {
 	if r.body != nil {
 		return nil
@@ -116,7 +107,6 @@ func (r *Request) GetParam(k string) string {
 }
 
 // ToHTTP is used to convert the Request object to an standard HTTP request object.
-//
 func (r *Request) ToHTTP() (*http.Request, error) {
 	// Encode the query parameters
 	r.url.RawQuery = r.params.Encode()
@@ -134,4 +124,20 @@ func (r *Request) ToHTTP() (*http.Request, error) {
 	req.Header = r.header
 
 	return req, nil
+}
+
+// DecodeBody is used to JSON decode a body
+func DecodeBody(resp *http.Response, out interface{}) error {
+	dec := json.NewDecoder(resp.Body)
+	return dec.Decode(out)
+}
+
+// EncodeBody is used to encode a request body
+func EncodeBody(obj interface{}) (io.Reader, error) {
+	buf := bytes.NewBuffer(nil)
+	enc := json.NewEncoder(buf)
+	if err := enc.Encode(obj); err != nil {
+		return nil, err
+	}
+	return buf, nil
 }

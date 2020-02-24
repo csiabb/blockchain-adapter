@@ -11,29 +11,31 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest"
+	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
 // RegisteAsset ...
-func (c *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (result *structs.AssetRegisterResponse, err error) {
+func (ac *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (result *structs.AssetRegisterResponse, err error) {
 	if body == nil {
 		err = fmt.Errorf("request payload is null")
 		return
 	}
 
 	header := http.Header{}
-	err = c.addSignatureHeader(&header, "", structs.PostMethod)
+	err = ac.addSignatureHeader(&header, "", structs.PostMethod)
 	if nil != err {
 		return
 	}
 
 	// Build http request
-	r := c.NewRequest(structs.PostMethod, structs.CreateAssetURL)
+	r := ac.c.NewRequest(structs.PostMethod, structs.CreateAssetURL)
 	r.SetHeaders(header)
 	r.SetBody(body)
 
 	// Do http request
-	_, resp, err := RequireOK(c.DoRequest(r))
+	_, resp, err := rhttp.RequireOK(ac.c.DoRequest(r))
 	if err != nil {
 		return
 	}
@@ -41,12 +43,12 @@ func (c *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (res
 
 	// Parse http response
 	var respBody structs.CommonResponse
-	if err = DecodeBody(resp, &respBody); err != nil {
+	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
 		return
 	}
 
-	if respBody.Code != structs.SuccCode {
-		err = fmt.Errorf(respBody.Message)
+	if respBody.Code != rest.SuccCode {
+		err = fmt.Errorf("Code: %d, Message: %s", respBody.Code, respBody.Message)
 		return
 	}
 
@@ -60,25 +62,25 @@ func (c *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (res
 }
 
 // QueryAssetDetail ...
-func (c *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailRequest) (result *structs.QueryAssetDetailResponse, err error) {
+func (ac *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailRequest) (result *structs.QueryAssetDetailResponse, err error) {
 	if body == nil {
 		err = fmt.Errorf("request payload is null")
 		return
 	}
 
 	header := http.Header{}
-	err = c.addSignatureHeader(&header, "", structs.GetMethod)
+	err = ac.addSignatureHeader(&header, "", structs.GetMethod)
 	if nil != err {
 		return
 	}
 
 	// Build http request
-	r := c.NewRequest(structs.GetMethod, structs.QueryAssetDetailURL)
+	r := ac.c.NewRequest(structs.GetMethod, structs.QueryAssetDetailURL)
 	r.SetHeaders(header)
 	r.SetParam("asset_did", body.AssetDID)
 
 	// Do http request
-	_, resp, err := RequireOK(c.DoRequest(r))
+	_, resp, err := rhttp.RequireOK(ac.c.DoRequest(r))
 	if err != nil {
 		return
 	}
@@ -86,12 +88,12 @@ func (c *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailReques
 
 	// Parse http response
 	var respBody structs.CommonResponse
-	if err = DecodeBody(resp, &respBody); err != nil {
+	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
 		return
 	}
 
-	if respBody.Code != structs.SuccCode {
-		err = fmt.Errorf(respBody.Message)
+	if respBody.Code != rest.SuccCode {
+		err = fmt.Errorf("Code: %d, Message: %s", respBody.Code, respBody.Message)
 		return
 	}
 

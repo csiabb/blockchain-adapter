@@ -7,26 +7,22 @@ SPDX-License-Identifier: Apache-2.0
 package api
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
-	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/config"
+	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/common"
+	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
+	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
 // ArxanchainClient aranchain block client
 type ArxanchainClient struct {
-	config     *config.Config
-	httpClient *http.Client
+	c *rhttp.Client
 }
 
 // NewArxanchainClient new arxanchain client
-func NewArxanchainClient(cfg *config.Config) (*ArxanchainClient, error) {
+func NewArxanchainClient(cfg *rhttp.Config) (*ArxanchainClient, error) {
 	if nil == cfg {
 		return nil, fmt.Errorf("config is nil")
 	}
@@ -43,94 +39,36 @@ func NewArxanchainClient(cfg *config.Config) (*ArxanchainClient, error) {
 		return nil, fmt.Errorf("Missing api secret config")
 	}
 
-	parts := strings.SplitN(cfg.Host, "://", 2)
-	if len(parts) == 2 {
-		switch parts[0] {
-		case "http":
-			cfg.Scheme = "http"
-		case "https":
-			cfg.Scheme = "https"
-		default:
-			return nil, fmt.Errorf("Unknown protocol scheme: %s", parts[0])
-		}
-		cfg.Host = parts[1]
-	}
-
-	c := &ArxanchainClient{
-		config:     cfg,
-		httpClient: &http.Client{},
-	}
-
-	return c, nil
-}
-
-// NewRequest is used to create a new request
-func (c *ArxanchainClient) NewRequest(method, path string) *Request {
-	r := &Request{
-		method: method,
-		url: &url.URL{
-			Scheme: c.config.Scheme,
-			Host:   c.config.Host,
-			Path:   path,
-		},
-		params: make(map[string][]string),
-		header: make(http.Header),
-	}
-	// Prevent data being compressed by gzip
-	r.header.Set("Accept-Encoding", "*")
-	return r
-}
-
-// DoRequest does an HTTP request.
-//
-// Once the crypto mode enabled, the response result will
-// be decrypted and verified signature using crypto libary,
-// then the final result will be return to end client.
-//
-func (c *ArxanchainClient) DoRequest(r *Request) (time.Duration, *http.Response, error) {
-	req, err := r.ToHTTP()
+	c, err := rhttp.NewClient(cfg)
 	if err != nil {
-		return 0, nil, err
-	}
-	start := time.Now()
-
-	resp, err := c.httpClient.Do(req)
-	diff := time.Since(start)
-
-	// decrypt and verify resp.Body
-	if err != nil {
-		return diff, resp, err
-	}
-	if resp == nil {
-		return diff, nil, fmt.Errorf("DoRequest http.Response is nil")
-	}
-
-	return diff, resp, err
-}
-
-// DecodeBody is used to JSON decode a body
-func DecodeBody(resp *http.Response, out interface{}) error {
-	dec := json.NewDecoder(resp.Body)
-	return dec.Decode(out)
-}
-
-// EncodeBody is used to encode a request body
-func EncodeBody(obj interface{}) (io.Reader, error) {
-	buf := bytes.NewBuffer(nil)
-	enc := json.NewEncoder(buf)
-	if err := enc.Encode(obj); err != nil {
 		return nil, err
 	}
-	return buf, nil
+
+	return &ArxanchainClient{c: c}, nil
 }
 
-// RequireOK is used to wrap DoRequest
-func RequireOK(d time.Duration, resp *http.Response, e error) (time.Duration, *http.Response, error) {
-	if e != nil {
-		if resp != nil {
-			resp.Body.Close()
-		}
-		return d, nil, e
+func (ac *ArxanchainClient) addSignatureHeader(header *http.Header, path, method string) error {
+	if nil == header {
+		return fmt.Errorf("header is nil")
 	}
-	return d, resp, nil
+	header.Add(structs.APIKeyHeader, ac.c.Cfg.APIKey)
+
+	sigData := &common.SignatureData{
+		Secret:        ac.c.Cfg.APISecret,
+		SignAlgo:      structs.HMACSHA256,
+		RequestPath:   path,
+		RequestMethod: method,
+		Timestamp:     time.Now().Unix(),
+	}
+
+	signature, err := common.Signature(sigData)
+	if nil != err {
+		return err
+	}
+
+	header.Add(structs.SignatureTimestamp, fmt.Sprintf("%d", sigData.Timestamp))
+	header.Add(structs.SignatureMethod, sigData.SignAlgo)
+	header.Add(structs.SignatureInfo, signature)
+
+	return nil
 }
