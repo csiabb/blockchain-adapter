@@ -13,15 +13,26 @@
 # limitations under the License.
 # 
 
-VERSION=0.1.0
+BINARY=blockchain-adapter
+VERSION=0.1.5
 BUILD=`date +%FT%T%z`
 
+BUILDPATH=build
+BUILDBINPATH=${BUILDPATH}/bin
+
 PACKAGES=`go list ./...`
-VETPACKAGES=`go list ./...`
 GOFILES=`find . -name "*.go"`
 
 default:
-	@go vet $(VETPACKAGES)
+	@CGO_ENABLED=0 go build -o ${BUILDBINPATH}/${BINARY}
+	@cp sampleconfig/blockchain-adapter.yaml ${BUILDBINPATH}
+
+list:
+	@echo ${PACKAGES}
+	@echo ${GOFILES}
+
+fmt:
+	@gofmt -s -w ${GOFILES}
 
 fmt-check:
 	@diff=$$(gofmt -s -d $(GOFILES)); \
@@ -31,18 +42,23 @@ fmt-check:
 		exit 1; \
 	fi;
 
-fmt:
-	@gofmt -s -w ${GOFILES}
-
-list:
-	@echo ${PACKAGES}
-	@echo ${VETPACKAGES}
-	@echo ${GOFILES}
-
 mod:
 	@go mod tidy
 
 test:
-	@go test -cpu=1,2,4 -v -tags integration ./...
+	@go test -cover -v -tags integration ./...
 
-.PHONY: default fmt-check fmt mod test
+vet:
+	@go vet $(PACKAGES)
+
+lint:
+	@golint $(PACKAGES)
+
+docker: default
+	@docker build -t csiabb/blockchain-adapter -f dockerfile/Dockerfile ./
+	@docker tag csiabb/blockchain-adapter:latest csiabb/blockchain-adapter:$(VERSION)
+
+clean:
+	@rm -rf ${BUILDPATH}
+
+.PHONY: default fmt fmt-check mod test vet lint docker clean
