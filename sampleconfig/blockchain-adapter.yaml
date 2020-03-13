@@ -28,3 +28,7 @@ Log:
     MaxBackups: 10
     # MaxAge is the maximum number of days to retain old log files
     MaxAge: 30
+
+# Callback blockchain callback configure
+Callback:
+    URL: http://127.0.0.1:8888/blockchain/callback

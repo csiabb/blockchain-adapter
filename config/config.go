@@ -25,12 +25,18 @@ var (
 type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
+	Callback      BlockchainCallbackCfg
 }
 
 // ServerGeneralCfg general configure of service
 type ServerGeneralCfg struct {
 	Host string
 	Port int
+}
+
+// BlockchainCallbackCfg blockchain callback notification configure
+type BlockchainCallbackCfg struct {
+	URL string
 }
 
 // GetServiceCfg returns the configurations for the service

@@ -12,6 +12,7 @@ import (
 
 	"github.com/csiabb/blockchain-adapter/common/log"
 	srvctx "github.com/csiabb/blockchain-adapter/context"
+	"github.com/csiabb/blockchain-adapter/controllers/blockchain"
 	"github.com/csiabb/blockchain-adapter/controllers/version"
 	"github.com/csiabb/blockchain-adapter/middleware"
 
@@ -26,11 +27,15 @@ const (
 var (
 	logger = log.MustGetLogger("router")
 
+	// checkServerVerion
+	checkVersionURL = "version"
+
 	// main url prefix
 	apiPrefix = fmt.Sprintf("api/%s", APIVersion)
 
-	// checkAPI
-	checkVersionURL = "version"
+	// controller url
+	accountsURL   = "blockchain/accounts"
+	publicitesURL = "blockchain/publicities"
 )
 
 // url path
@@ -38,8 +43,9 @@ const ()
 
 // Router service router
 type Router struct {
-	context        *srvctx.Context
-	versionHandler *version.RestHandler
+	context           *srvctx.Context
+	versionHandler    *version.RestHandler
+	blockchainHandler *blockchain.RestHandler
 }
 
 // InitRouter init router
@@ -55,6 +61,13 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 	r.versionHandler, err = version.NewRestHandler(r.context)
 	if err != nil {
 		logger.Errorf("Failed to create version rest http handler instance, %+v", err)
+		return err
+	}
+
+	// Init blockchain handler
+	r.blockchainHandler, err = blockchain.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create blockchain rest http handler instance, %+v", err)
 		return err
 	}
 
@@ -75,6 +88,9 @@ func (r *Router) SetupRouter() *gin.Engine {
 	{
 		// log reponse and request
 		apiPrefix.Use(middleware.RequestResponseLogger())
+
+		apiPrefix.POST(accountsURL, r.blockchainHandler.CreateAccount)
+		apiPrefix.POST(publicitesURL, r.blockchainHandler.PublicityData)
 	}
 	return router
 }
