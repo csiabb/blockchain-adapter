@@ -14,6 +14,11 @@ import (
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/common"
 	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
+	"github.com/csiabb/blockchain-adapter/common/log"
+)
+
+var (
+	logger = log.MustGetLogger("arxanchain")
 )
 
 // ArxanchainClient aranchain block client
@@ -27,8 +32,12 @@ func NewArxanchainClient(cfg *rhttp.Config) (*ArxanchainClient, error) {
 		return nil, fmt.Errorf("config is nil")
 	}
 
-	if "" == cfg.Host {
-		return nil, fmt.Errorf("Missing host config")
+	if !cfg.Enabled {
+		return nil, fmt.Errorf("arxanchain is disabled")
+	}
+
+	if "" == cfg.Endpoint {
+		return nil, fmt.Errorf("Missing endpoint config")
 	}
 
 	if "" == cfg.APIKey {
@@ -51,6 +60,7 @@ func (ac *ArxanchainClient) addSignatureHeader(header *http.Header, path, method
 	if nil == header {
 		return fmt.Errorf("header is nil")
 	}
+
 	header.Add(structs.APIKeyHeader, ac.c.Cfg.APIKey)
 
 	sigData := &common.SignatureData{

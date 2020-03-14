@@ -32,3 +32,12 @@ Log:
 # Callback blockchain callback configure
 Callback:
     URL: http://127.0.0.1:8888/blockchain/callback
+
+# Arxanchain arxanchain blockchain configure
+Arxanchain:
+    Enabled: true
+    Name: arxanchain
+    Endpoint: https://aboxtest.arxanchain.com
+    APIKey: XxEVWIAD1579163844
+    APISecret: nXAVIKEMHUONGXREDDBAAUDXIPWQIGQZ
+    Callback: https://csiabb.com/arxanchain/callback

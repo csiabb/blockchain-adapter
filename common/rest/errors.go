@@ -13,4 +13,6 @@ const (
 	ParamsParseErr   = 2001
 	ParamsMissingErr = 2002
 	ParamsInvalidErr = 2003
+
+	InternalServerErr = 2010
 )

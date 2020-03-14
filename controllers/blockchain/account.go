@@ -9,6 +9,7 @@ package blockchain
 import (
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter"
 	"github.com/csiabb/blockchain-adapter/common/rest"
 	"github.com/csiabb/blockchain-adapter/structs/api"
 
@@ -30,7 +31,17 @@ func (h *RestHandler) CreateAccount(c *gin.Context) {
 	}
 	logger.Infof("request params: %+v", req)
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(&api.BlockchainResponse{ID: ""}))
+	var bcResp *adapter.BlockchainResponse
+	if h.srvcContext.Config.Arxanchain.Enabled {
+		bcResp, err = h.srvcContext.ArxanchainClient.CreateAccount(&adapter.CreateAccountReq{AccountID: req.AccountID})
+		if nil != err {
+			logger.Errorf("arxanchain create account error: %v", err)
+			c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerErr, err.Error()))
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&api.BlockchainResponse{ID: bcResp.ID}))
 	logger.Infof("response create account success.")
 	return
 }

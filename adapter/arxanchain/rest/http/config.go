@@ -8,8 +8,11 @@ package http
 
 // Config arxanchain client config
 type Config struct {
+	Enabled   bool
+	Name      string
 	Scheme    string
-	Host      string // arxanchain service host url
+	Endpoint  string // arxanchain service endpoint
 	APIKey    string // api key
 	APISecret string // api secret
+	Callback  string // notify blockchain result callback url
 }

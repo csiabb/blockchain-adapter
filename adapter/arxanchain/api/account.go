@@ -11,26 +11,30 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest"
 	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
 // CreateAccount ...
-func (ac *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (result *structs.AccountResponse, err error) {
-	if body == nil {
-		err = fmt.Errorf("request payload is null")
+func (ac *ArxanchainClient) CreateAccount(param *adapter.CreateAccountReq) (result *adapter.BlockchainResponse, err error) {
+	if nil == param {
+		err = fmt.Errorf("param is nil")
 		return
 	}
 
+	body := &structs.CreateAccountRequest{UID: param.AccountID}
+
 	header := http.Header{}
-	err = ac.addSignatureHeader(&header, "", structs.PostMethod)
+	err = ac.addSignatureHeader(&header, structs.CreateAccountURL, http.MethodPost)
 	if nil != err {
 		return
 	}
+	header.Add("Content-Type", "application/json")
 
 	// Build http request
-	r := ac.c.NewRequest(structs.PostMethod, structs.CreateAccountURL)
+	r := ac.c.NewRequest(http.MethodPost, structs.CreateAccountURL)
 	r.SetHeaders(header)
 	r.SetBody(body)
 
@@ -42,7 +46,7 @@ func (ac *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (r
 	defer resp.Body.Close()
 
 	// Parse http response
-	var respBody structs.CommonResponse
+	var respBody structs.ArxanResponse
 	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
 		return
 	}
@@ -57,6 +61,12 @@ func (ac *ArxanchainClient) CreateAccount(body *structs.CreateAccountRequest) (r
 		return
 	}
 
-	err = json.Unmarshal(payloadBytes, &result)
+	var respAccount *structs.AccountResponse
+	err = json.Unmarshal(payloadBytes, &respAccount)
+	if nil != err {
+		return
+	}
+
+	result = &adapter.BlockchainResponse{ID: respAccount.DID}
 	return
 }

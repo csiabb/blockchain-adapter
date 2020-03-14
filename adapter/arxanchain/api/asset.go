@@ -11,26 +11,35 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest"
 	rhttp "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/adapter/arxanchain/structs"
 )
 
-// RegisteAsset ...
-func (ac *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (result *structs.AssetRegisterResponse, err error) {
-	if body == nil {
-		err = fmt.Errorf("request payload is null")
+// PublicityData ...
+func (ac *ArxanchainClient) PublicityData(param *adapter.PublicityDataReq) (result *adapter.BlockchainResponse, err error) {
+	if nil == param {
+		err = fmt.Errorf("param is nil")
 		return
+	}
+	body := &structs.AssetRegisterRequest{
+		OwnerDID:   param.AccountID,
+		AssetName:  "publicity-data",
+		Visibility: "private",
+		Intro:      "publicity-data of " + param.AccountID,
+		Metadata:   param.Publicity,
 	}
 
 	header := http.Header{}
-	err = ac.addSignatureHeader(&header, "", structs.PostMethod)
+	err = ac.addSignatureHeader(&header, structs.CreateAssetURL, http.MethodPost)
 	if nil != err {
 		return
 	}
+	header.Add("Content-Type", "application/json")
 
 	// Build http request
-	r := ac.c.NewRequest(structs.PostMethod, structs.CreateAssetURL)
+	r := ac.c.NewRequest(http.MethodPost, structs.CreateAssetURL)
 	r.SetHeaders(header)
 	r.SetBody(body)
 
@@ -42,7 +51,7 @@ func (ac *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (re
 	defer resp.Body.Close()
 
 	// Parse http response
-	var respBody structs.CommonResponse
+	var respBody structs.ArxanResponse
 	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
 		return
 	}
@@ -57,51 +66,12 @@ func (ac *ArxanchainClient) RegisteAsset(body *structs.AssetRegisterRequest) (re
 		return
 	}
 
-	err = json.Unmarshal(payloadBytes, &result)
-	return
-}
-
-// QueryAssetDetail ...
-func (ac *ArxanchainClient) QueryAssetDetail(body *structs.QueryAssetDetailRequest) (result *structs.QueryAssetDetailResponse, err error) {
-	if body == nil {
-		err = fmt.Errorf("request payload is null")
-		return
-	}
-
-	header := http.Header{}
-	err = ac.addSignatureHeader(&header, "", structs.GetMethod)
+	var respAssest *structs.AssetRegisterResponse
+	err = json.Unmarshal(payloadBytes, &respAssest)
 	if nil != err {
 		return
 	}
 
-	// Build http request
-	r := ac.c.NewRequest(structs.GetMethod, structs.QueryAssetDetailURL)
-	r.SetHeaders(header)
-	r.SetParam("asset_did", body.AssetDID)
-
-	// Do http request
-	_, resp, err := rhttp.RequireOK(ac.c.DoRequest(r))
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-
-	// Parse http response
-	var respBody structs.CommonResponse
-	if err = rhttp.DecodeBody(resp, &respBody); err != nil {
-		return
-	}
-
-	if respBody.Code != rest.SuccCode {
-		err = fmt.Errorf("Code: %d, Message: %s", respBody.Code, respBody.Message)
-		return
-	}
-
-	payloadBytes, err := json.Marshal(respBody.Payload)
-	if nil != err {
-		return
-	}
-
-	err = json.Unmarshal(payloadBytes, &result)
+	result = &adapter.BlockchainResponse{ID: respAssest.AssetDID}
 	return
 }

@@ -16,24 +16,9 @@ const (
 	HMACSHA256 = "hmac-sha256"
 )
 
-// http method
-const (
-	PostMethod = "POST"
-	GetMethod  = "GET"
-)
-
 // arxanchain api url
 const (
 	CreateAccountURL = "/api/v1/abox/account/create"
 
-	CreateAssetURL      = "/api/v1/abox/asset/register"
-	QueryAssetDetailURL = "/api/v1/abox/asset/detail"
-)
-
-// aranchain blockchain action type
-const (
-	CreateAccount = "create_acc"
-
-	CreateAsset = "create_asset"
-	QueryAsset  = "query_asset"
+	CreateAssetURL = "/api/v1/abox/asset/register"
 )

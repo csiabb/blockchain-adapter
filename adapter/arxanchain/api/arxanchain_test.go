@@ -14,7 +14,8 @@ import (
 
 func TestNewArxanchainClient(t *testing.T) {
 	cfg := &rhttp.Config{
-		Host:      "https://aboxtest.arxanchain.com",
+		Enabled:   true,
+		Endpoint:  "https://aboxtest.arxanchain.com",
 		APIKey:    "XxEVWIAD1579163843",
 		APISecret: "nXAVIKEMHUONGXREDDBAAUDXIPWQIGQZ",
 	}

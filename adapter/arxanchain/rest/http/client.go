@@ -26,7 +26,7 @@ func NewClient(cfg *Config) (*Client, error) {
 		return nil, fmt.Errorf("config is nil")
 	}
 
-	parts := strings.SplitN(cfg.Host, "://", 2)
+	parts := strings.SplitN(cfg.Endpoint, "://", 2)
 	if len(parts) == 2 {
 		switch parts[0] {
 		case "http":
@@ -36,7 +36,7 @@ func NewClient(cfg *Config) (*Client, error) {
 		default:
 			return nil, fmt.Errorf("Unknown protocol scheme: %s", parts[0])
 		}
-		cfg.Host = parts[1]
+		cfg.Endpoint = parts[1]
 	}
 
 	return &Client{
@@ -51,7 +51,7 @@ func (c *Client) NewRequest(method, path string) *Request {
 		method: method,
 		url: &url.URL{
 			Scheme: c.Cfg.Scheme,
-			Host:   c.Cfg.Host,
+			Host:   c.Cfg.Endpoint,
 			Path:   path,
 		},
 		params: make(map[string][]string),

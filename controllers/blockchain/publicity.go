@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/csiabb/blockchain-adapter/adapter"
 	"github.com/csiabb/blockchain-adapter/common/rest"
 	"github.com/csiabb/blockchain-adapter/structs/api"
 
@@ -42,7 +43,20 @@ func (h *RestHandler) PublicityData(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, rest.SuccessResponse(&api.BlockchainResponse{ID: ""}))
+	var bcResp *adapter.BlockchainResponse
+	if h.srvcContext.Config.Arxanchain.Enabled {
+		bcResp, err = h.srvcContext.ArxanchainClient.PublicityData(&adapter.PublicityDataReq{
+			AccountID: req.UID,
+			Publicity: req.Publicity,
+		})
+		if nil != err {
+			logger.Errorf("arxanchain publicity data error: %v", err)
+			c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerErr, err.Error()))
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, rest.SuccessResponse(&api.BlockchainResponse{ID: bcResp.ID}))
 	logger.Infof("response publicity data success.")
 	return
 }

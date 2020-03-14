@@ -9,6 +9,7 @@ package config
 import (
 	"fmt"
 
+	arxan "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/common/log"
 )
 
@@ -26,6 +27,7 @@ type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
 	Callback      BlockchainCallbackCfg
+	Arxanchain    arxan.Config
 }
 
 // ServerGeneralCfg general configure of service
