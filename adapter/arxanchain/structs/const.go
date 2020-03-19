@@ -18,6 +18,8 @@ const (
 
 // arxanchain api url
 const (
+	BlockchainName = "arxan"
+
 	CreateAccountURL = "/api/v1/abox/account/create"
 
 	CreateAssetURL = "/api/v1/abox/asset/register"

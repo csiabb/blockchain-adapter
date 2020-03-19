@@ -24,11 +24,12 @@ func (ac *ArxanchainClient) PublicityData(param *adapter.PublicityDataReq) (resu
 		return
 	}
 	body := &structs.AssetRegisterRequest{
-		OwnerDID:   param.AccountID,
-		AssetName:  "publicity-data",
-		Visibility: "private",
-		Intro:      "publicity-data of " + param.AccountID,
-		Metadata:   param.Publicity,
+		OwnerDID:    param.AccountID,
+		AssetName:   "publicity-data",
+		Visibility:  "private",
+		Intro:       "publicity-data of " + param.AccountID,
+		Metadata:    param.Publicity,
+		CallbackURL: ac.c.Cfg.Callback,
 	}
 
 	header := http.Header{}

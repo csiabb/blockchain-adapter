@@ -12,6 +12,7 @@ type Config struct {
 	Name      string
 	Scheme    string
 	Endpoint  string // arxanchain service endpoint
+	APIPrefix string // api prefix
 	APIKey    string // api key
 	APISecret string // api secret
 	Callback  string // notify blockchain result callback url

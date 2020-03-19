@@ -12,6 +12,7 @@ import (
 	"github.com/csiabb/blockchain-adapter/adapter"
 	arxan "github.com/csiabb/blockchain-adapter/adapter/arxanchain/api"
 	"github.com/csiabb/blockchain-adapter/common/log"
+	"github.com/csiabb/blockchain-adapter/components/callback"
 	"github.com/csiabb/blockchain-adapter/config"
 )
 
@@ -23,6 +24,7 @@ var (
 // Context the context of service
 type Context struct {
 	Config           *config.SrvcCfg
+	CallbackClient   callback.ICallback
 	ArxanchainClient adapter.BlockchainAdapter
 }
 
@@ -44,6 +46,13 @@ func (c *Context) Init() error {
 	logger.Debugf("Initalization configure: %v", c.Config)
 
 	var err error
+
+	c.CallbackClient, err = callback.NewCallbackClient(&c.Config.Callback)
+	if nil != err {
+		logger.Errorf("new callback client error, %v", err)
+		return fmt.Errorf("new callback client error: %s", err.Error())
+	}
+
 	if c.Config.Arxanchain.Enabled {
 		c.ArxanchainClient, err = arxan.NewArxanchainClient(&c.Config.Arxanchain)
 		if nil != err {

@@ -11,6 +11,7 @@ import (
 
 	arxan "github.com/csiabb/blockchain-adapter/adapter/arxanchain/rest/http"
 	"github.com/csiabb/blockchain-adapter/common/log"
+	"github.com/csiabb/blockchain-adapter/components/callback"
 )
 
 var (
@@ -26,7 +27,7 @@ var (
 type SrvcCfg struct {
 	ServerGeneral ServerGeneralCfg
 	Log           log.Config
-	Callback      BlockchainCallbackCfg
+	Callback      callback.Config
 	Arxanchain    arxan.Config
 }
 
@@ -34,11 +35,6 @@ type SrvcCfg struct {
 type ServerGeneralCfg struct {
 	Host string
 	Port int
-}
-
-// BlockchainCallbackCfg blockchain callback notification configure
-type BlockchainCallbackCfg struct {
-	URL string
 }
 
 // GetServiceCfg returns the configurations for the service

@@ -45,3 +45,27 @@ type AssetRegisterRequest struct {
 type AssetRegisterResponse struct {
 	AssetDID string `json:"asset_did"`
 }
+
+// CallBackRequest ...
+type CallBackRequest struct {
+	ID          string `json:"id" binding:"required"`
+	TxID        string `json:"tx_id" binding:"required"`
+	Type        string `json:"type" binding:"required"`
+	Status      string `json:"status" binding:"required"`
+	BlockNumber uint64 `json:"block_number" binding:"required"`
+	OnChainTime int64  `json:"on_chain_time" binding:"required"`
+}
+
+// callback response code
+const (
+	SuccCode = "SUCCESS"
+	FailCode = "FAIL"
+
+	SuccMsg = "deal done"
+)
+
+// CallBackResponse ...
+type CallBackResponse struct {
+	Code string `json:"code"`
+	Msg  string `json:"msg"`
+}

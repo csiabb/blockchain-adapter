@@ -13,6 +13,7 @@ import (
 	"github.com/csiabb/blockchain-adapter/common/log"
 	srvctx "github.com/csiabb/blockchain-adapter/context"
 	"github.com/csiabb/blockchain-adapter/controllers/blockchain"
+	"github.com/csiabb/blockchain-adapter/controllers/callback"
 	"github.com/csiabb/blockchain-adapter/controllers/version"
 	"github.com/csiabb/blockchain-adapter/middleware"
 
@@ -36,6 +37,9 @@ var (
 	// controller url
 	accountsURL   = "blockchain/accounts"
 	publicitesURL = "blockchain/publicities"
+
+	// blockchain callback url
+	arxanchainCallbckURL = "blockchain/callback/arxan"
 )
 
 // url path
@@ -46,6 +50,7 @@ type Router struct {
 	context           *srvctx.Context
 	versionHandler    *version.RestHandler
 	blockchainHandler *blockchain.RestHandler
+	callbackHandler   *callback.RestHandler
 }
 
 // InitRouter init router
@@ -71,6 +76,13 @@ func (r *Router) InitRouter(ctx *srvctx.Context) error {
 		return err
 	}
 
+	// Init blockchain callback handler
+	r.callbackHandler, err = callback.NewRestHandler(r.context)
+	if err != nil {
+		logger.Errorf("Failed to create blockchain callback notify rest http handler instance, %+v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -91,6 +103,8 @@ func (r *Router) SetupRouter() *gin.Engine {
 
 		apiPrefix.POST(accountsURL, r.blockchainHandler.CreateAccount)
 		apiPrefix.POST(publicitesURL, r.blockchainHandler.PublicityData)
+
+		apiPrefix.POST(arxanchainCallbckURL, r.callbackHandler.ArxanchainCallback)
 	}
 	return router
 }

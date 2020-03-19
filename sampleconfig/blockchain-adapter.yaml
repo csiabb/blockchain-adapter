@@ -29,8 +29,9 @@ Log:
     # MaxAge is the maximum number of days to retain old log files
     MaxAge: 30
 
-# Callback blockchain callback configure
+# Callback donation server blockchain callback
 Callback:
+    TimeOut: 5 # callback time out, default: 5s
     URL: http://127.0.0.1:8888/blockchain/callback
 
 # Arxanchain arxanchain blockchain configure
@@ -38,6 +39,7 @@ Arxanchain:
     Enabled: true
     Name: arxanchain
     Endpoint: https://aboxtest.arxanchain.com
+    APIPrefix: 
     APIKey: XxEVWIAD1579163844
     APISecret: nXAVIKEMHUONGXREDDBAAUDXIPWQIGQZ
-    Callback: https://csiabb.com/arxanchain/callback
+    Callback: https://csiabb.com/api/v1/blockchain/callback/arxan

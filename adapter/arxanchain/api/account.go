@@ -24,7 +24,10 @@ func (ac *ArxanchainClient) CreateAccount(param *adapter.CreateAccountReq) (resu
 		return
 	}
 
-	body := &structs.CreateAccountRequest{UID: param.AccountID}
+	body := &structs.CreateAccountRequest{
+		UID:         param.AccountID,
+		CallbackURL: ac.c.Cfg.Callback,
+	}
 
 	header := http.Header{}
 	err = ac.addSignatureHeader(&header, structs.CreateAccountURL, http.MethodPost)

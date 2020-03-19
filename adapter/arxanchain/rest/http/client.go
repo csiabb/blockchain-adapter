@@ -47,6 +47,9 @@ func NewClient(cfg *Config) (*Client, error) {
 
 // NewRequest is used to create a new request
 func (c *Client) NewRequest(method, path string) *Request {
+	if c.Cfg.APIPrefix != "" {
+		path = c.Cfg.APIPrefix + path
+	}
 	r := &Request{
 		method: method,
 		url: &url.URL{

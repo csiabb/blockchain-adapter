@@ -33,7 +33,9 @@ func (h *RestHandler) CreateAccount(c *gin.Context) {
 
 	var bcResp *adapter.BlockchainResponse
 	if h.srvcContext.Config.Arxanchain.Enabled {
-		bcResp, err = h.srvcContext.ArxanchainClient.CreateAccount(&adapter.CreateAccountReq{AccountID: req.AccountID})
+		bcResp, err = h.srvcContext.ArxanchainClient.CreateAccount(&adapter.CreateAccountReq{
+			AccountID: req.AccountID,
+		})
 		if nil != err {
 			logger.Errorf("arxanchain create account error: %v", err)
 			c.JSON(http.StatusInternalServerError, rest.ErrorResponse(rest.InternalServerErr, err.Error()))
