@@ -6,6 +6,6 @@ RUN mkdir -p ${BLOCKCHAIN_ADAPTER_CFG_PATH} ${BLOCKCHAIN_ADAPTER_LOG_PATH} ${BLO
 COPY build/bin/blockchain-adapter /usr/local/bin
 COPY sampleconfig/blockchain-adapter.yaml ${BLOCKCHAIN_ADAPTER_CFG_PATH}/
 
-EXPOSE 8888
+EXPOSE 8989
 
 CMD ["blockchain-adapter"]
